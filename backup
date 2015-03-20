@@ -1,0 +1,127 @@
+/**
+		 * Common
+		 * 基础功能，所有app都会用到
+		 */
+		Efte.extend({
+			getUA: function() {
+				return {
+					platform: "web",
+					appName: "dpapp-debugger",
+					appVersion: "dpapp-debugger",
+					deviceName: "dpapp-debugger",
+					deviceVersion: "dpapp-debugger",
+				};
+			},
+			ready: function(callback) {
+				document.addEventListener("DOMContentLoaded", function(event) {
+					callback();
+				});
+			},
+			ajax: function(opts) {
+				var METHOD_GET = "GET";
+				var url = opts.url;
+				var method = (opts.method || METHOD_GET).toUpperCase();
+				var headers = opts.headers || {};
+				var data = opts.data;
+				var success = opts.success;
+				var fail = opts.fail;
+
+				xhr = new XMLHttpRequest();
+
+				if (!url) {
+					url = location.href.split("?")[0];
+				}
+
+				if (method === METHOD_GET && data) {
+					url += parseQuery(data);
+					data = null;
+				}
+
+				if (method !== METHOD_GET) {
+					xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+				}
+
+				function parseQuery(data) {
+					var queryString = "";
+					for (var key in data) {
+						queryString += key + '=' + encodeURIComponent(data[key])
+					}
+					return queryString;
+				}
+
+				xhr.onreadystatechange = function() {
+					if (xhr.readyState == 4) { // ready
+						xhr.onreadystatechange = function() {};
+						var result, error = false;
+						if ((xhr.status >= 200 && xhr.status < 300) || xhr.status == 304) {
+							result = xhr.responseText;
+
+							try {
+								result = /^\s*$/.test(result) ? null : JSON.parse(result);
+							} catch (e) {
+								error = e;
+							}
+
+							if (error) fail && fail('ERR_PARSE_JSON');
+							else success(result);
+						} else {
+							fail && fail(xhr.statusText);
+						}
+					}
+				};
+
+				xhr.open(opts.method, url, true, opts.username, opts.password);
+				for (var name in headers) {
+					xhr.setRequestHeader(name, headers[name]);
+				}
+				xhr.send(data);
+			},
+			ga: function(opts) {
+
+			},
+			// ImagePicker: ImagePicker,
+			uploadImage: function() {
+
+			},
+			downloadImage: notImplemented,
+			closeWindow: function() {
+				window.close();
+			}
+		});
+
+		/**
+		 * Infos
+		 */
+		Efte.extend({
+			getLocation: function(opts) {
+				var success = opts.success;
+				var fail = opts.fail;
+				navigator.geolocation.getCurrentPosition(function(position) {
+					success && success({
+						lat: position.coords.latitude,
+						lng: position.coords.longitude
+					});
+				}, function() {
+					success && success({
+						lat: 0,
+						lng: 0
+					});
+				});
+			},
+			// 无法完美实现就不实现
+			getNetworkType: notImplemented,
+			getCityId: function(opts) {
+				var success = opts.success;
+				success && success({
+					cityId: 1
+				});
+			},
+			getUserInfo: function(opts) {
+				var success = opts.success;
+				success && success({
+					token: "d5d4b69be8de9e81615a9682e4ab773971004eef8f0da2db858525af9faf35cc"
+				});
+			},
+			getContactList: notImplemented,
+			getCX: notImplemented
+		});

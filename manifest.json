@@ -1,0 +1,12 @@
+{
+	"manifest_version": 2,
+	"name": "Rogue",
+	"description": "dpapp debug tools.",
+	"version": "1.0",
+	"permissions": [
+		"background", "webRequest", "webRequestBlocking", "http://localhost:9074/*"
+	],
+	"background": {
+		"scripts": ["devtools.js"]
+	}
+}
